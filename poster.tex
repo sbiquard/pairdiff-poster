@@ -28,6 +28,8 @@
 \pgfplotsset{compat=1.14}
 \usepackage{anyfontsize}
 
+% \usepackage[format=hang]{caption}
+
 % ====================
 % Lengths
 % ====================
@@ -45,7 +47,7 @@
 % Title
 % ====================
 
-\title{Map-making strategies for next generation CMB experiments}
+\title{Map-making strategies for next generation CMB polarization experiments}
 
 \author{Simon Biquard}
 
@@ -89,27 +91,37 @@
 
     \begin{column}{\colwidth}
 
-      \begin{block}{A block title}
+      \begin{block}{Introduction}
 
-        Some block contents, followed by a diagram, followed by a dummy paragraph.
+        The quest for B-mode polarization of the cosmic microwave background (CMB) is leading modern experiments to line up tens, even hundreds of thousands of detectors in order to distinguish the primordial signal from numerous foregrounds.
+        As a result, their time-ordered data (TOD) is increasing to an unprecedented volume, challenging our ability to analyze it correctly and efficiently.
 
-        \begin{figure}
+        \begin{table}
           \centering
-          \includegraphics[width=0.6\textwidth]{figures/results_fig.pdf}
-        \end{figure}
+          \begin{tabular}{l c c c}
+            \toprule
+            \text{}     & \textbf{Polarbear} & \textbf{SO} & \textbf{CMB-S4} \\
+            \midrule
+            Data volume & 100 TB             & 2 PB        & 50 PB           \\
+            CPU hours   & 20 k               & 35 M        & 500 M           \\
+            \bottomrule
+          \end{tabular}
+          \caption{Data volume and current CPU time needed to produce \emph{one} sky map.}
+        \end{table}
 
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi ultricies
-        eget libero ac ullamcorper. Integer et euismod ante. Aenean vestibulum
-        lobortis augue, ut lobortis turpis rhoncus sed. Proin feugiat nibh a
-        lacinia dignissim. Proin scelerisque, risus eget tempor fermentum, ex
-        turpis condimentum urna, quis malesuada sapien arcu eu purus.
+        \textbf{Map-making}, i.e. the reconstruction of the observed sky from the TOD, compresses the volume of the data by many orders of magnitude, while trying to preserve relevant cosmological information as much as possible.
 
       \end{block}
 
-      \begin{block}{A block containing a list}
+      \begin{block}{Formalism and estimators}
 
-        Nam vulputate nunc felis, non condimentum lacus porta ultrices. Nullam sed
-        sagittis metus. Etiam consectetur gravida urna quis suscipit.
+        Map-making is typically formulated as a \emph{linear} operation projecting the TOD to a map in the pixel domain:
+        \[ m = L d \]
+        assuming a data model of the form
+        \[ d = P s + n \]
+        where $s$ is the true pixelized sky, scanned with a pointing matrix $P$, and $n$ is a noise vector.
+
+        Popular choices for the linear operator $L$ are:
 
         \begin{itemize}
           \item \textbf{Mauris tempor} risus nulla, sed ornare
