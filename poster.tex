@@ -28,7 +28,25 @@
 \pgfplotsset{compat=1.14}
 \usepackage{anyfontsize}
 
-% \usepackage[format=hang]{caption}
+\usepackage[margin=10pt,
+            % labelfont=bf,
+            % labelsep=endash,
+            format=plain,
+]{caption}
+\usepackage{amsmath,amssymb}
+\usepackage{siunitx}
+\usepackage{physics2}
+\usephysicsmodule{ab} % automatic bracing
+
+% macros for \vb, \va and \vu
+\makeatletter
+\newcommand\vb{\@ifstar\boldsymbol\mathbf}
+\newcommand\va[1]{\@ifstar{\vec{#1}}{\vec{\mathrm{#1}}}}
+\newcommand\vu[1]{%
+\@ifstar{\hat{\boldsymbol{#1}}}{\hat{\mathbf{#1}}}}
+\makeatother
+
+\newcommand{\transpose}[1]{\ensuremath{#1^{\mathsf T}}}
 
 % ====================
 % Lengths
@@ -83,8 +101,6 @@
 
 \begin{document}
 
-
-
 \begin{frame}[t]
   \begin{columns}[t]
     \separatorcolumn
@@ -113,48 +129,36 @@
 
       \end{block}
 
-      \begin{block}{Formalism and estimators}
+      \begin{alertblock}{Map-making basics}
 
-        Map-making is typically formulated as a \emph{linear} operation projecting the TOD to a map in the pixel domain:
-        \[ m = L d \]
-        assuming a data model of the form
-        \[ d = P s + n \]
-        where $s$ is the true pixelized sky, scanned with a pointing matrix $P$, and $n$ is a noise vector.
+        \heading{Data model and GLS solution}
 
-        Popular choices for the linear operator $L$ are:
+        Let's assume that the TOD is calibrated and collected in a vector $\vb{d}$.
+        For polarization sensitive detectors, each measured sample $d_t$ contains a sky signal contribution from the observed pixel $p_t$, and some noise:
 
-        \begin{itemize}
-          \item \textbf{Mauris tempor} risus nulla, sed ornare
-          \item \textbf{Libero tincidunt} a duis congue vitae
-          \item \textbf{Dui ac pretium} morbi justo neque, ullamcorper
-        \end{itemize}
+        \[ d_t = I_{p_t} + \cos(2\phi_t) Q_{p_t} + \sin(2\phi_t) U_{p_t} + n_t \]
 
-        Eget augue porta, bibendum venenatis tortor.
+        The angle $\phi_t$ is the orientation of the detector projected on the sky.
+        This model is written in matrix form using the \emph{pointing matrix} $\vb P$ which encodes the scanning and orientation of the telescope.
 
-      \end{block}
+        \[ \vb d = \vb P \vb m + \vb n \]
 
-      \begin{alertblock}{A highlighted block}
+        In this form, map-making is simply a linear problem for which the GLS solution is an unbiased estimator for any choice of a positive definite \emph{weight matrix} $\vb M$.
 
-        This block catches your eye, so \textbf{important stuff} should probably go
-        here.
+        \[ \vu m = \pab{\transpose{\vb P} \vb M \vb P}^{-1} \transpose{\vb P} \vb M \vb d \]
 
-        Curabitur eu libero vehicula, cursus est fringilla, luctus est. Morbi
-        consectetur mauris quam, at finibus elit auctor ac. Aliquam erat volutpat.
-        Aenean at nisl ut ex ullamcorper eleifend et eu augue. Aenean quis velit
-        tristique odio convallis ultrices a ac odio.
+        If $\vb M = \vb N^{-1}$ the time domain noise covariance matrix, and if the noise is Gaussian, then $\vu m$ is the minimum variance and maximum likelihood solution.
+
+        \heading{Observing from the ground}
+
+        Ground-based experiments have to deal with two specific contaminants which are very bright compared to the CMB:
 
         \begin{itemize}
-          \item \textbf{Fusce dapibus tellus} vel tellus semper finibus. In
-                consequat, nibh sed mattis luctus, augue diam fermentum lectus.
-          \item \textbf{In euismod erat metus} non ex. Vestibulum luctus augue in
-                mi condimentum, at sollicitudin lorem viverra.
-          \item \textbf{Suspendisse vulputate} mauris vel placerat consectetur.
-                Mauris semper, purus ac hendrerit molestie, elit mi dignissim odio, in
-                suscipit felis sapien vel ex.
+          \item \emph{atmospheric signal}, a major source of noise correlations, which makes the estimation and inversion of $\vb N$ difficult
+          \item \emph{ground pickup}, typically due to the far side-lobes of the beam
         \end{itemize}
 
-        Aenean tincidunt risus eros, at gravida lorem sagittis vel. Vestibulum ante
-        ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae.
+        Those contaminants are largely unpolarized, which motivates the \textbf{pair differencing} approach, where the timestreams of two orthogonal detectors are subtracted in order to eliminate non polarized signals.
 
       \end{alertblock}
 
@@ -164,78 +168,24 @@
 
     \begin{column}{\colwidth}
 
-      \begin{block}{A block containing an enumerated list}
+      \begin{block}{Evaluation of the pair differencing approach}
 
-        Vivamus congue volutpat elit non semper. Praesent molestie nec erat ac
-        interdum. In quis suscipit erat. \textbf{Phasellus mauris felis, molestie
-          ac pharetra quis}, tempus nec ante. Donec finibus ante vel purus mollis
-        fermentum. Sed felis mi, pharetra eget nibh a, feugiat eleifend dolor. Nam
-        mollis condimentum purus quis sodales. Nullam eu felis eu nulla eleifend
-        bibendum nec eu lorem. Vivamus felis velit, volutpat ut facilisis ac,
-        commodo in metus.
-
-        \begin{enumerate}
-          \item \textbf{Morbi mauris purus}, egestas at vehicula et, convallis
-                accumsan orci. Orci varius natoque penatibus et magnis dis parturient
-                montes, nascetur ridiculus mus.
-          \item \textbf{Cras vehicula blandit urna ut maximus}. Aliquam blandit nec
-                massa ac sollicitudin. Curabitur cursus, metus nec imperdiet bibendum,
-                velit lectus faucibus dolor, quis gravida metus mauris gravida turpis.
-          \item \textbf{Vestibulum et massa diam}. Phasellus fermentum augue non
-                nulla accumsan, non rhoncus lectus condimentum.
-        \end{enumerate}
-
-      \end{block}
-
-      \begin{block}{Fusce aliquam magna velit}
-
-        Et rutrum ex euismod vel. Pellentesque ultricies, velit in fermentum
-        vestibulum, lectus nisi pretium nibh, sit amet aliquam lectus augue vel
-        velit. Suspendisse rhoncus massa porttitor augue feugiat molestie. Sed
-        molestie ut orci nec malesuada. Sed ultricies feugiat est fringilla
-        posuere.
-
-        \begin{figure}
-          \centering
-          \includegraphics[width=0.3\textwidth]{figures/dag.png}
-
-          \caption{Another figure caption.}
-        \end{figure}
-
-      \end{block}
-
-      \begin{block}{Nam cursus consequat egestas}
-
-        Nulla eget sem quam. Ut aliquam volutpat nisi vestibulum convallis. Nunc a
-        lectus et eros facilisis hendrerit eu non urna. Interdum et malesuada fames
-        ac ante \textit{ipsum primis} in faucibus. Etiam sit amet velit eget sem
-        euismod tristique. Praesent enim erat, porta vel mattis sed, pharetra sed
-        ipsum. Morbi commodo condimentum massa, \textit{tempus venenatis} massa
-        hendrerit quis. Maecenas sed porta est. Praesent mollis interdum lectus,
-        sit amet sollicitudin risus tincidunt non.
-
-        Etiam sit amet tempus lorem, aliquet condimentum velit. Donec et nibh
-        consequat, sagittis ex eget, dictum orci. Etiam quis semper ante. Ut eu
-        mauris purus. Proin nec consectetur ligula. Mauris pretium molestie
-        ullamcorper. Integer nisi neque, aliquet et odio non, sagittis porta justo.
-
+        I use the map-making library \texttt{mappraiser}\cite{ElBouhargani:2021umq} to process simulations produced with the \texttt{TOAST} software:
         \begin{itemize}
-          \item \textbf{Sed consequat} id ante vel efficitur. Praesent congue massa
-                sed est scelerisque, elementum mollis augue iaculis.
-                \begin{itemize}
-                  \item In sed est finibus, vulputate
-                        nunc gravida, pulvinar lorem. In maximus nunc dolor, sed auctor eros
-                        porttitor quis.
-                  \item Fusce ornare dignissim nisi. Nam sit amet risus vel lacus
-                        tempor tincidunt eu a arcu.
-                  \item Donec rhoncus vestibulum erat, quis aliquam leo
-                        gravida egestas.
-                \end{itemize}
-          \item \textbf{Sed luctus, elit sit amet} dictum maximus, diam dolor
-                faucibus purus, sed lobortis justo erat id turpis.
-          \item \textbf{Pellentesque facilisis dolor in leo} bibendum congue.
-                Maecenas congue finibus justo, vitae eleifend urna facilisis at.
+          \item instrument: SO-SAT @ 90 GHz
+          \item schedule: one day per month during one year
+          \item sky: CMB lensed scalar anisotropies (from Planck FFP10 simulations)
+          \item high-resolution atmosphere simulation
+          \item instrumental noise
+          \item gain errors in detector pairs
+          \item in the future: elliptical beams
         \end{itemize}
+
+        \emph{Figure of merit ?}
+
+      \end{block}
+
+      \begin{block}{Results: gain errors}
 
       \end{block}
 
@@ -245,64 +195,16 @@
 
     \begin{column}{\colwidth}
 
-      \begin{exampleblock}{A highlighted block containing some math}
+      \begin{exampleblock}{Numerical advantages of pair differencing}
 
-        A different kind of highlighted block.
-
-        $$
-          \int_{-\infty}^{\infty} e^{-x^2}\,dx = \sqrt{\pi}
-        $$
-
-        Interdum et malesuada fames $\{1, 4, 9, \ldots\}$ ac ante ipsum primis in
-        faucibus. Cras eleifend dolor eu nulla suscipit suscipit. Sed lobortis non
-        felis id vulputate.
-
-        \heading{A heading inside a block}
-
-        Praesent consectetur mi $x^2 + y^2$ metus, nec vestibulum justo viverra
-        nec. Proin eget nulla pretium, egestas magna aliquam, mollis neque. Vivamus
-        dictum $\mathbf{u}^\intercal\mathbf{v}$ sagittis odio, vel porta erat
-        congue sed. Maecenas ut dolor quis arcu auctor porttitor.
-
-        \heading{Another heading inside a block}
-
-        Sed augue erat, scelerisque a purus ultricies, placerat porttitor neque.
-        Donec $P(y \mid x)$ fermentum consectetur $\nabla_x P(y \mid x)$ sapien
-        sagittis egestas. Duis eget leo euismod nunc viverra imperdiet nec id
-        justo.
+        Reduce noise correlations...
 
       \end{exampleblock}
 
-      \begin{block}{Nullam vel erat at velit convallis laoreet}
+      \begin{block}{Conclusion / Discussion ?}
 
-        Class aptent taciti sociosqu ad litora torquent per conubia nostra, per
-        inceptos himenaeos. Phasellus libero enim, gravida sed erat sit amet,
-        scelerisque congue diam. Fusce dapibus dui ut augue pulvinar iaculis.
-
-        \begin{table}
-          \centering
-          \begin{tabular}{l r r c}
-            \toprule
-            \textbf{First column} & \textbf{Second column} & \textbf{Third column} & \textbf{Fourth} \\
-            \midrule
-            Foo                   & 13.37                  & 384,394               & $\alpha$        \\
-            Bar                   & 2.17                   & 1,392                 & $\beta$         \\
-            Baz                   & 3.14                   & 83,742                & $\delta$        \\
-            Qux                   & 7.59                   & 974                   & $\gamma$        \\
-            \bottomrule
-          \end{tabular}
-          \caption{A table caption.}
-        \end{table}
-
-        Donec quis posuere ligula. Nunc feugiat elit a mi malesuada consequat. Sed
-        imperdiet augue ac nibh aliquet tristique. Aenean eu tortor vulputate,
-        eleifend lorem in, dictum urna. Proin auctor ante in augue tincidunt
-        tempor. Proin pellentesque vulputate odio, ac gravida nulla posuere
-        efficitur. Aenean at velit vel dolor blandit molestie. Mauris laoreet
-        commodo quam, non luctus nibh ullamcorper in. Class aptent taciti sociosqu
-        ad litora torquent per conubia nostra, per inceptos himenaeos.
-
-
+        In what conditions is pair differencing reasonable to use ?
+        What do we lose ? What do we gain ?
 
       \end{block}
 
