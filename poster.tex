@@ -109,9 +109,13 @@
 
       \begin{block}{Introduction}
 
-        The quest for B-mode polarization of the cosmic microwave background (CMB) is leading modern experiments to line up tens, even hundreds of thousands of detectors in order to distinguish the primordial signal from numerous foregrounds.
-        As a result, their time-ordered data (TOD) is increasing to an unprecedented volume, challenging our ability to analyze it correctly and efficiently.
+        \emph{Map-making} is the reconstruction of the observed sky from the time-ordered data (TOD) collected by a telescope.
+        It compresses the volume of data by many orders of magnitude, while trying to preserve cosmological information.
 
+        In the quest for B-mode polarization of the CMB, modern experiments are lining up tens, even hundreds of thousands of detectors to extract the primordial signal.
+        As a result, the size of the TOD is increasing to an unprecedented volume, challenging our ability to analyze it correctly and efficiently.
+
+        % keep this table or not?
         \begin{table}
           \centering
           \begin{tabular}{l c c c}
@@ -125,40 +129,41 @@
           \caption{Data volume and current CPU time needed to produce \emph{one} sky map.}
         \end{table}
 
-        \textbf{Map-making}, i.e. the reconstruction of the observed sky from the TOD, compresses the volume of the data by many orders of magnitude, while trying to preserve relevant cosmological information as much as possible.
-
       \end{block}
 
-      \begin{alertblock}{Map-making basics}
+      \begin{alertblock}{Quick review of map-making flavors}
 
-        \heading{Data model and GLS solution}
+        \heading{Data model and basics}
 
-        Let's assume that the TOD is calibrated and collected in a vector $\vb{d}$.
-        For polarization sensitive detectors, each measured sample $d_t$ contains a sky signal contribution from the observed pixel $p_t$, and some noise:
+        \begin{equation}\label{eq:data_model}
+          \mathbf d = \mathbf{P s} + \mathbf n
+        \end{equation}
 
-        \[ d_t = I_{p_t} + \cos(2\phi_t) Q_{p_t} + \sin(2\phi_t) U_{p_t} + n_t \]
-
-        The angle $\phi_t$ is the orientation of the detector projected on the sky.
-        This model is written in matrix form using the \emph{pointing matrix} $\vb P$ which encodes the scanning and orientation of the telescope.
-
-        \[ \vb d = \vb P \vb m + \vb n \]
-
-        In this form, map-making is simply a linear problem for which the GLS solution is an unbiased estimator for any choice of a positive definite \emph{weight matrix} $\vb M$.
-
-        \[ \vu m = \pab{\transpose{\vb P} \vb M \vb P}^{-1} \transpose{\vb P} \vb M \vb d \]
-
-        If $\vb M = \vb N^{-1}$ the time domain noise covariance matrix, and if the noise is Gaussian, then $\vu m$ is the minimum variance and maximum likelihood solution.
-
-        \heading{Observing from the ground}
-
-        Ground-based experiments have to deal with two specific contaminants which are very bright compared to the CMB:
+        This is the usual assumed data model for the map-making problem.
 
         \begin{itemize}
-          \item \emph{atmospheric signal}, a major source of noise correlations, which makes the estimation and inversion of $\vb N$ difficult
-          \item \emph{ground pickup}, typically due to the far side-lobes of the beam
+          \item $\mathbf d$ = TOD (calibrated)
+          \item $\mathbf P$ = pointing matrix, encodes scanning and orientation of the telescope
+          \item $\mathbf s$ = true sky map
+          \item $\mathbf n$ = noise vector
         \end{itemize}
 
-        Those contaminants are largely unpolarized, which motivates the \textbf{pair differencing} approach, where the timestreams of two orthogonal detectors are subtracted in order to eliminate non polarized signals.
+        Map-making is just a \emph{linear operation}, \( \mathbf m = \mathbf{L d} \), mapping the TOD to an estimator $\mathbf m$ of the true sky map.
+
+        \heading{Pros and cons of different estimators}
+
+        % If $\vb M = \vb N^{-1}$ the time domain noise covariance matrix, and if the noise is Gaussian, then $\vu m$ is the minimum variance and maximum likelihood solution.
+
+        % \heading{Observing from the ground}
+
+        % Ground-based experiments have to deal with two specific contaminants which are very bright compared to the CMB:
+
+        % \begin{itemize}
+        %   \item \emph{atmospheric signal}, a major source of noise correlations, which makes the estimation and inversion of $\vb N$ difficult
+        %   \item \emph{ground pickup}, typically due to the far side-lobes of the beam
+        % \end{itemize}
+
+        % Those contaminants are largely unpolarized, which motivates the \textbf{pair differencing} approach, where the timestreams of two orthogonal detectors are subtracted in order to eliminate non polarized signals.
 
       \end{alertblock}
 
