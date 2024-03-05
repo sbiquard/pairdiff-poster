@@ -133,7 +133,7 @@
 
       \begin{alertblock}{Quick review of map-making flavors}
 
-        \heading{Data model and basics}
+        \heading{Data model and estimators}
 
         \begin{equation}\label{eq:data_model}
           \mathbf d = \mathbf{P s} + \mathbf n
@@ -149,19 +149,33 @@
         \end{itemize}
 
         Map-making is just a \emph{linear operation}, \( \mathbf m = \mathbf{L d} \), mapping the TOD to an estimator $\mathbf m$ of the true sky map.
+        % Different choices of operator \( \mathbf L \) lead to sky estimates with completely different properties, which impact the data analysis pipeline further down.
 
-        \heading{Pros and cons of different estimators}
+        \begin{table}
+          \centering
+          \begin{tabular}{l l c c}
+            \toprule
+            \textbf{Method} & \textbf{Operator} \(\mathbf L\)                                                                                              & \textbf{Pros}           & \textbf{Cons} \\
+            \midrule
+            Binning         & \( \pab{\transpose{\mathbf P} \mathbf P}^{-1} \transpose{\mathbf P} \)                                                       & unbiased, cheap         & complex noise \\
+            \midrule
+            GLS             & \( \pab{\transpose{\mathbf P} \mathbf{C}_\mathbf{n}^{-1} \mathbf P}^{-1} \transpose{\mathbf P} \mathbf{C}_\mathbf{n}^{-1} \) & unbiased, min. variance & expensive     \\
+            \midrule
+            Filter-and-bin  & \( \pab{\transpose{\mathbf P} \mathbf{\Lambda P}}^{-1} \transpose{\mathbf P} \mathbf F \)                                    & easy to compute         & biased        \\
+            \midrule
+            Templates       & \( \pab{\transpose{\mathbf P} \mathbf{F P}}^{-1} \transpose{\mathbf P} \mathbf F \)                                          & unbiased filtering      & expensive     \\
+            \bottomrule
+          \end{tabular}
+        \end{table}
 
-        % If $\vb M = \vb N^{-1}$ the time domain noise covariance matrix, and if the noise is Gaussian, then $\vu m$ is the minimum variance and maximum likelihood solution.
+        \heading{Observing from the ground}
 
-        % \heading{Observing from the ground}
+        Ground-based experiments have to deal with two specific contaminants which are very bright compared to the CMB:
 
-        % Ground-based experiments have to deal with two specific contaminants which are very bright compared to the CMB:
-
-        % \begin{itemize}
-        %   \item \emph{atmospheric signal}, a major source of noise correlations, which makes the estimation and inversion of $\vb N$ difficult
-        %   \item \emph{ground pickup}, typically due to the far side-lobes of the beam
-        % \end{itemize}
+        \begin{itemize}
+          \item \emph{atmospheric signal}, a major source of noise correlations
+          \item \emph{ground pickup}, typically due to the far side-lobes of the beam
+        \end{itemize}
 
         % Those contaminants are largely unpolarized, which motivates the \textbf{pair differencing} approach, where the timestreams of two orthogonal detectors are subtracted in order to eliminate non polarized signals.
 
