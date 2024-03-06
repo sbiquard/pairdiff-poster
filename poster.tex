@@ -157,15 +157,16 @@
             \toprule
             \textbf{Method} & \textbf{Operator} \(\mathbf L\)                                                                                              & \textbf{Pros}           & \textbf{Cons} \\
             \midrule
-            Binning         & \( \pab{\transpose{\mathbf P} \mathbf P}^{-1} \transpose{\mathbf P} \)                                                       & unbiased, cheap         & complex noise \\
+            Binning         & \( \pab{\transpose{\mathbf P} \mathbf{\Lambda P}}^{-1} \transpose{\mathbf P} \mathbf \Lambda \)                              & unbiased, cheap         & complex noise \\
             \midrule
             GLS             & \( \pab{\transpose{\mathbf P} \mathbf{C}_\mathbf{n}^{-1} \mathbf P}^{-1} \transpose{\mathbf P} \mathbf{C}_\mathbf{n}^{-1} \) & unbiased, min. variance & expensive     \\
             \midrule
             Filter-and-bin  & \( \pab{\transpose{\mathbf P} \mathbf{\Lambda P}}^{-1} \transpose{\mathbf P} \mathbf F \)                                    & easy to compute         & biased        \\
             \midrule
-            Templates       & \( \pab{\transpose{\mathbf P} \mathbf{F P}}^{-1} \transpose{\mathbf P} \mathbf F \)                                          & unbiased filtering      & expensive     \\
+            Templates       & \( \pab{\transpose{\mathbf P} \mathbf{F P}}^{-1} \transpose{\mathbf P} \mathbf F \)                                          & unbiased filtering      & iterative     \\
             \bottomrule
           \end{tabular}
+          \caption{Comparison of different map-making approaches. Legend: \(\mathbf \Lambda\) = diagonal noise weights; \(\mathbf{C}_\mathbf{n}^{-1}\) = noise covariance matrix; \(\mathbf F\) = filtering and weighting operator.}
         \end{table}
 
         \heading{Observing from the ground}
