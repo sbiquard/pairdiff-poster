@@ -22,6 +22,9 @@
 \pgfplotsset{compat=1.18}
 \usepackage{anyfontsize}
 
+\usepackage{unicode-math}
+\setmathfont[Scale=MatchUppercase]{libertinusmath-regular.otf}
+
 \usepackage[margin=10pt,
             % labelfont=bf,
             % labelsep=endash,
@@ -140,37 +143,36 @@
         \heading{Data model and estimators}
 
         \begin{equation}\label{eq:data_model}
-          \mathbf d = \mathbf{P s} + \mathbf n
+          d = P s + n
         \end{equation}
 
         This is the usual assumed data model for the map-making problem.
 
         \begin{itemize}
-          \item $\mathbf d$ = TOD (calibrated)
-          \item $\mathbf P$ = pointing matrix, encodes scanning and orientation of the telescope
-          \item $\mathbf s$ = true sky map
-          \item $\mathbf n$ = noise vector
+          \item $d$ = TOD (calibrated)
+          \item $P$ = pointing matrix, encodes scanning and orientation of the telescope
+          \item $s$ = true sky map
+          \item $n$ = noise vector
         \end{itemize}
 
-        Map-making is just a \emph{linear operation}, \( \mathbf m = \mathbf{L d} \), mapping the TOD to an estimator $\mathbf m$ of the true sky map.
-        % Different choices of operator \( \mathbf L \) lead to sky estimates with completely different properties, which impact the data analysis pipeline further down.
+        Map-making is just a \emph{linear operation}, $m = Ld$, mapping the TOD to an estimator $m$ of the true sky map.
 
         \begin{table}
           \centering
           \begin{tabular}{l l c c}
             \toprule
-            \textbf{Method} & \textbf{Operator} \(\mathbf L\)                                                                                              & \textbf{Pros}           & \textbf{Cons} \\
+            \textbf{Method} & \textbf{Operator} $L$                                            & \textbf{Pros}           & \textbf{Cons} \\
             \midrule
-            Binning         & \( \pab{\transpose{\mathbf P} \mathbf{\Lambda P}}^{-1} \transpose{\mathbf P} \mathbf \Lambda \)                              & unbiased, cheap         & complex noise \\
+            Binning         & \( \pab{\transpose{P} \Lambda P}^{-1} \transpose{P} \Lambda \)   & unbiased, cheap         & complex noise \\
             \midrule
-            GLS             & \( \pab{\transpose{\mathbf P} \mathbf{C}_\mathbf{n}^{-1} \mathbf P}^{-1} \transpose{\mathbf P} \mathbf{C}_\mathbf{n}^{-1} \) & unbiased, min. variance & expensive     \\
+            GLS             & \( \pab{\transpose{P} C_n^{-1} P}^{-1} \transpose{P} C_n^{-1} \) & unbiased, min. variance & expensive     \\
             \midrule
-            Filter-and-bin  & \( \pab{\transpose{\mathbf P} \mathbf{\Lambda P}}^{-1} \transpose{\mathbf P} \mathbf F \)                                    & easy to compute         & biased        \\
+            Filter-and-bin  & \( \pab{\transpose{P} {\Lambda P}}^{-1} \transpose{P} F \)       & easy to compute         & biased        \\
             \midrule
-            Templates       & \( \pab{\transpose{\mathbf P} \mathbf{F P}}^{-1} \transpose{\mathbf P} \mathbf F \)                                          & unbiased filtering      & iterative     \\
+            Templates       & \( \pab{\transpose{P} F P}^{-1} \transpose{P} F \)               & unbiased filtering      & iterative     \\
             \bottomrule
           \end{tabular}
-          \caption{Comparison of different map-making approaches. Legend: \(\mathbf \Lambda\) = diagonal noise weights; \(\mathbf{C}_\mathbf{n}^{-1}\) = noise covariance matrix; \(\mathbf F\) = filtering and weighting operator.}
+          \caption{Comparison of different map-making approaches. Legend: $\Lambda$ = diagonal noise weights; $C_n^{-1}$ = noise covariance matrix; $F$ = filtering and weighting operator.}
         \end{table}
 
         \heading{Observing from the ground}
@@ -188,7 +190,8 @@
 
       \begin{block}{Evaluation of the pair differencing approach}
 
-        I use the map-making library \texttt{mappraiser}\cite{ElBouhargani:2021umq} to process simulations produced with the \texttt{TOAST} software:
+        I use the map-making library \texttt{mappraiser}~\cite{ElBouhargani:2021umq} to process simulations produced with the \texttt{TOAST} software:
+
         \begin{itemize}
           \item instrument: SO-SAT @ 90 GHz
           \item schedule: one day per month during one year
@@ -211,18 +214,37 @@
 
       \begin{block}{Results: gain errors}
 
+        \begin{figure}
+          \centering
+          \includegraphics[width=0.8\textwidth]{figures/comparison_bb.png}
+          \caption{B-mode spectrum in different configurations. Solid lines are the measured spectrum, dotted lines are the difference with respect to the input spectrum (residual).}
+        \end{figure}
       \end{block}
 
       \begin{exampleblock}{Numerical advantages of pair differencing}
 
-        Reduce noise correlations...
+        The map-making equation is solved \emph{iteratively} using a conjugate gradient (CG) algorithm.
+        If $m_t$ is the approximate solution obtained at the $t$-th step of the algorithm, and $m_\ast$ the true solution, then an upper bound of the error is given by:
+
+        \begin{equation}
+          \Vab{m_\ast - m_t}_A \leq 2 \bab{\frac{\sqrt{\kappa} - 1}{\sqrt{\kappa} + 1}}^t \Vab{m_\ast - m_0}_A
+        \end{equation}
+
+        So the convergence rate of the algorithm essentially depends on the \emph{condition number} $\kappa$ of the system matrix.
+        Strong noise correlations increase $\kappa$. By removing most of the intensity signal of the atmosphere, we also drastically improve the convergence speed of the algorithm.
+
+        \begin{figure}
+          \centering
+          \includegraphics[width=0.8\textwidth]{figures/convergence.png}
+          \caption{Convergence comparison with and without atmospheric correlations.}
+        \end{figure}
 
       \end{exampleblock}
 
       \begin{block}{Conclusion / Discussion ?}
 
-        In what conditions is pair differencing reasonable to use ?
-        What do we lose ? What do we gain ?
+        In what conditions is pair differencing reasonable to use?
+        What do we lose? What do we gain?
 
       \end{block}
 
