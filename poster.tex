@@ -21,6 +21,10 @@
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
 \usepackage{anyfontsize}
+\usepackage{xcolor}
+\usepackage{dirtytalk}
+\usepackage{wrapfig}
+% \usepackage{hyperref}
 
 \usepackage{unicode-math}
 \setmathfont[Scale=MatchUppercase]{libertinusmath-regular.otf}
@@ -122,15 +126,15 @@
         In the quest for B-mode polarization of the CMB, modern experiments are lining up tens, even hundreds of thousands of detectors to extract the primordial signal.
         As a result, the size of the TOD is increasing to an unprecedented volume, challenging our ability to analyze it correctly and efficiently.
 
-        % keep this table or not?
+        % FIXME: keep this table or not?
         \begin{table}
           \centering
           \begin{tabular}{l c c c}
             \toprule
-            \text{}     & \textbf{Polarbear} & \textbf{SO} & \textbf{CMB-S4} \\
+            \text{}     & \textbf{Polarbear}                 & \textbf{SO}                       & \textbf{CMB-S4}                    \\
             \midrule
-            Data volume & 100 TB             & 2 PB        & 50 PB           \\
-            CPU hours   & 20 k               & 35 M        & 500 M           \\
+            Data volume & $\qty[mode=text]{100}{\tera\byte}$ & $\qty[mode=text]{2}{\peta\byte}$  & $\qty[mode=text]{50}{\peta\byte}$  \\
+            CPU time    & $\qty[mode=text]{20}{\kilo\hour}$  & $\qty[mode=text]{35}{\mega\hour}$ & $\qty[mode=text]{500}{\mega\hour}$ \\
             \bottomrule
           \end{tabular}
           \caption{Data volume and current CPU time needed to produce \emph{one} sky map.}
@@ -184,16 +188,89 @@
           \item \emph{ground pickup}, typically due to the far side-lobes of the beam
         \end{itemize}
 
-        Those contaminants are largely unpolarized, which motivates the \textbf{pair differencing} approach, where the timestreams of two orthogonal detectors are subtracted in order to eliminate non polarized signals.
+        The binned estimate will not take these effects into account at all and the resulting map may be severely completely dominated by them.
+        The GLS estimate will consider these components as noise and downweight them to make an optimal map.
+        The filter-bin estimate will fit and remove a model of those signals from the TOD, but this will typically remove some sky signal as well; the effect must be quantified and corrected using transfer functions.
+        Template map-making will jointly deproject the contaminants and estimate the sky signal in an unbiased way.
+
+        % TODO: comment about how the different methods deal with those contaminants
 
       \end{alertblock}
 
-      \begin{block}{Evaluation of the pair differencing approach}
+      \begin{block}{The pair differencing approach}
+
+        \begin{wrapfigure}{r}{0.4\colwidth}
+          \includegraphics[width=\linewidth]{figures/sinuous-antenna-center-red.png}
+          \caption{Center of a sinuous antenna detector used for Simons Observatory.}
+          \label{fig:sinuous-antenna}
+        \end{wrapfigure}
+
+        We assume that the atmospheric signal and the ground pickup are \emph{unpolarized}.
+        This motivates the \textbf{pair differencing} approach, where the timestreams of two orthogonal detectors (see Figure~\ref{fig:sinuous-antenna}) are subtracted in order to eliminate non polarized signals.
+        \[
+          d_{A/B} = I \pm P
+          \quad\longrightarrow\quad
+          d_- = \frac12 \pab{d_A - d_B} = P
+        \]
+
+        This operation ideally decouples intensity and polarization components so that we can reconstruct the polarization signal \emph{exclusively} from the differenced TOD.
+        This simple approach has been (and still is) used in CMB experiments such as Polarbear, BICEP, (others ?) % TODO: citations
+
+        \heading{Advantages}
+
+        The map-making equation is solved \emph{iteratively} using a conjugate gradient (CG) algorithm.
+        If $m_t$ is the approximate solution obtained at the $t$-th step of the algorithm, and $m_\ast$ the true solution, then an upper bound of the error is given by:
+
+        \begin{equation}
+          \Vab{m_\ast - m_t}_A \leq 2 \bab{\frac{\sqrt{\mathcolor{red}{\kappa}} - 1}{\sqrt{\mathcolor{red}{\kappa}} + 1}}^t \Vab{m_\ast - m_0}_A
+        \end{equation}
+
+        So the convergence rate of the algorithm essentially depends on the \emph{condition number} $\kappa$ of the system matrix.
+        Strong noise correlations increase $\kappa$. By removing most of the intensity signal of the atmosphere, we also drastically improve the convergence speed of the algorithm (Figure~\ref{fig:convergence}). % TODO: use autoref ?
+
+        % TODO: comment about near optimality of pair diff
+        We can show that pair differencing is nearly optimal [\dots]
+
+      \end{block}
+
+    \end{column}
+
+    \separatorcolumn
+
+    \begin{column}{\colwidth}
+
+      \begin{block}{}
+
+        \begin{figure}
+          \centering
+          \includegraphics[width=0.8\textwidth]{figures/convergence.png}
+          \caption{Convergence comparison with and without atmospheric correlations.}
+          \label{fig:convergence}
+        \end{figure}
+
+        \heading{Drawbacks}
+
+        For the intensity signal to fully cancel, the two orthogonal detectors have to be identical.
+        Even with careful calibration, this can never be achieved perfectly.
+        The most important effects which are expected to cause leakage of the intensity signal into the differenced TOD are:
+
+        \begin{itemize}
+          \item miscalibration of the detector gains
+          \item bandpass differences
+          \item different beam shapes
+        \end{itemize}
+
+      \end{block}
+
+      \begin{block}{Simulations and results}
+
+        % The Simons Observatory (SO) is a ground-based CMB experiment located on Cerro Toco, $\qty[mode=text]{5300}{\meter}$ above sea level, in the Atacama desert of Chile.
+        % The \say{nominal} SO experiment consists of three $\qty[mode=text]{0.4}{\meter}$ Small Aperture Telescopes (SATs) and one $\qty[mode=text]{6}{\meter}$ Large Aperture Telescope (LAT).
 
         I use the map-making library \texttt{mappraiser}~\cite{ElBouhargani:2021umq} to process simulations produced with the \texttt{TOAST} software:
 
         \begin{itemize}
-          \item instrument: SO-SAT @ 90 GHz
+          \item instrument: SO-SAT @ $\qty[mode=text]{90}{\giga\hertz}$
           \item schedule: one day per month during one year
           \item sky: CMB lensed scalar anisotropies (from Planck FFP10 simulations)
           \item high-resolution atmosphere simulation
@@ -204,42 +281,12 @@
 
         \emph{Figure of merit ?}
 
-      \end{block}
-
-    \end{column}
-
-    \separatorcolumn
-
-    \begin{column}{\colwidth}
-
-      \begin{block}{Results: gain errors}
-
         \begin{figure}
           \centering
-          \includegraphics[width=0.8\textwidth]{figures/comparison_bb.png}
+          \includegraphics[width=0.8\textwidth]{figures/comparison.png}
           \caption{B-mode spectrum in different configurations. Solid lines are the measured spectrum, dotted lines are the difference with respect to the input spectrum (residual).}
         \end{figure}
       \end{block}
-
-      \begin{exampleblock}{Numerical advantages of pair differencing}
-
-        The map-making equation is solved \emph{iteratively} using a conjugate gradient (CG) algorithm.
-        If $m_t$ is the approximate solution obtained at the $t$-th step of the algorithm, and $m_\ast$ the true solution, then an upper bound of the error is given by:
-
-        \begin{equation}
-          \Vab{m_\ast - m_t}_A \leq 2 \bab{\frac{\sqrt{\kappa} - 1}{\sqrt{\kappa} + 1}}^t \Vab{m_\ast - m_0}_A
-        \end{equation}
-
-        So the convergence rate of the algorithm essentially depends on the \emph{condition number} $\kappa$ of the system matrix.
-        Strong noise correlations increase $\kappa$. By removing most of the intensity signal of the atmosphere, we also drastically improve the convergence speed of the algorithm.
-
-        \begin{figure}
-          \centering
-          \includegraphics[width=0.8\textwidth]{figures/convergence.png}
-          \caption{Convergence comparison with and without atmospheric correlations.}
-        \end{figure}
-
-      \end{exampleblock}
 
       \begin{block}{Conclusion / Discussion ?}
 
