@@ -33,6 +33,7 @@
   url=false,
   doi=false,
   isbn=false,
+  eprint=false,
 ]{biblatex}
 \addbibresource{poster.bib}
 
@@ -270,7 +271,7 @@
 
       \begin{figure}
         \centering
-        \includegraphics[width=0.8\textwidth]{figures/convergence.png}
+        \includegraphics[width=0.7\textwidth]{figures/convergence.png}
         \caption{Convergence comparison with and without atmospheric correlations.}
         \label{fig:convergence}
       \end{figure}
@@ -285,7 +286,7 @@
         \begin{itemize}
           \item instrument: Simons Observatory Small Aperture Telescope @ $\qty[mode=text]{90}{\giga\hertz}$
           \item schedule: one day per month during one year
-          \item sky: CMB lensed scalar anisotropies (from Planck FFP10 simulations)
+          \item sky: CMB lensed scalar anisotropies (from Planck FFP10 simulations \cite{Planck:2018-iii})
           \item high-resolution atmosphere simulation
           \item instrumental noise
           \item gain errors of one percent in detector pairs
