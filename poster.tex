@@ -36,6 +36,7 @@
   eprint=false,
 ]{biblatex}
 \addbibresource{poster.bib}
+\AtBeginBibliography{\footnotesize}
 
 \usepackage{unicode-math}
 \setmathfont[Scale=MatchUppercase]{libertinusmath-regular.otf}
@@ -281,10 +282,11 @@
         % The Simons Observatory (SO) is a ground-based CMB experiment located on Cerro Toco, $\qty[mode=text]{5200}{\meter}$ above sea level, in the Atacama desert of Chile.
         % The \say{nominal} SO experiment consists of three $\qty[mode=text]{0.4}{\meter}$ Small Aperture Telescopes (SATs) and one $\qty[mode=text]{6}{\meter}$ Large Aperture Telescope (LAT).
 
-        Our current setup uses the TOAST framework for simulating data and the MAPPRAISER library~\cite{ElBouhargani:2021umq} for producing the sky maps.
+        Our current setup uses the Time-Ordered Astrophysics Scalable Tools (TOAST) package~\cite{toast} for simulating data and the MAPPRAISER library~\cite{ElBouhargani:2021umq} for producing the sky maps.
 
         \begin{itemize}
           \item instrument: Simons Observatory Small Aperture Telescope @ $\qty[mode=text]{90}{\giga\hertz}$
+          \item rotating half wave plate (HWP) at $\qty[mode=text]{120}{rpm}$ for polarization modulation
           \item schedule: one day per month during one year
           \item sky: CMB lensed scalar anisotropies (from Planck FFP10 simulations \cite{Planck:2018-iii})
           \item high-resolution atmosphere simulation
@@ -292,7 +294,7 @@
           \item gain errors of one percent in detector pairs
         \end{itemize}
 
-        For the moment, we simply compare the B-mode residual spectra to the theoretical predictions.
+        For the moment, we simply compare the \emph{residual spectra} (measured on the difference between the reconstructed and input sky maps) with the theory predictions.
 
         \begin{figure}
           \centering
@@ -307,7 +309,7 @@
           \item \textbf{black}: reference case (no gain errors)
           \item {\color{Green} \textbf{green}}: pair differencing (PD) run according to description above
           \item {\color{Red} \textbf{red}}: PD run, but without including atmospheric signal (aligned with black)
-          \item {\color{Purple} \textbf{purple}}: PD run, but without a rotating half wave plate
+          \item {\color{Purple} \textbf{purple}}: PD run, but without the HWP modulation
           \item {\color{Sepia} \textbf{brown}}: PD run, without atmosphere and without HWP (only the CMB intensity is leaking into the differenced TOD)
           \item {\color{VioletRed} \textbf{pink}}: PD run, additionally fitting for the leaked intensity signal
         \end{itemize}
@@ -331,7 +333,7 @@
       \begin{block}{References}
 
         \nocite{*}
-        \footnotesize{\printbibliography}
+        \printbibliography
 
       \end{block}
 
