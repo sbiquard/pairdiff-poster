@@ -26,6 +26,16 @@
 \usepackage{wrapfig}
 % \usepackage{hyperref}
 
+\usepackage[
+  backend=biber,
+  style=numeric,
+  sorting=ynt,
+  url=false,
+  doi=false,
+  isbn=false,
+]{biblatex}
+\addbibresource{poster.bib}
+
 \usepackage{unicode-math}
 \setmathfont[Scale=MatchUppercase]{libertinusmath-regular.otf}
 
@@ -225,7 +235,7 @@
         \]
 
         This subtraction ideally decouples intensity and polarization components so that we can reconstruct the polarization signal \emph{exclusively} from the differenced TOD.
-        This simple approach has been (and still is) used in CMB experiments such as Polarbear or BICEP. % TODO: citations
+        This simple approach has been (and still is) used in CMB experiments such as Polarbear~\cite{Poletti:2016xhi} and BICEP/Keck~\cite{BICEP2:2014dgt}. % TODO: citations
 
         \heading{Advantages}
 
@@ -270,7 +280,7 @@
         % The Simons Observatory (SO) is a ground-based CMB experiment located on Cerro Toco, $\qty[mode=text]{5200}{\meter}$ above sea level, in the Atacama desert of Chile.
         % The \say{nominal} SO experiment consists of three $\qty[mode=text]{0.4}{\meter}$ Small Aperture Telescopes (SATs) and one $\qty[mode=text]{6}{\meter}$ Large Aperture Telescope (LAT).
 
-        Our current setup uses the TOAST framework for simulating data
+        Our current setup uses the TOAST framework for simulating data and the MAPPRAISER library~\cite{ElBouhargani:2021umq} for producing the sky maps.
 
         \begin{itemize}
           \item instrument: Simons Observatory Small Aperture Telescope @ $\qty[mode=text]{90}{\giga\hertz}$
@@ -306,7 +316,7 @@
       \begin{block}{References}
 
         \nocite{*}
-        \footnotesize{\bibliographystyle{plain}\bibliography{poster}}
+        \footnotesize{\printbibliography}
 
       \end{block}
 
