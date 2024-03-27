@@ -21,7 +21,7 @@
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
 \usepackage{anyfontsize}
-\usepackage{xcolor}
+\usepackage[dvipsnames]{xcolor}
 \usepackage{dirtytalk}
 \usepackage{wrapfig}
 % \usepackage{hyperref}
@@ -240,9 +240,9 @@
         \heading{Advantages}
 
         \begin{itemize}
-          \item Remove (most of) the unpolarized signals without any further assumptions or atmosphere models.
-          \item Numerical benefits: atmosphere introduces long noise correlations, which worsen the \emph{conditioning} of the map-making system; removing those greatly speeds up the convergence (see Figure~\ref{fig:convergence}).
-          \item Polarization maps reconstructed from the differenced TOD are formally equivalent to the GLS solution if we assume no particular model for the atmosphere (i.e. only that it is unpolarized and common to the orthogonal detectors in a pair).
+          \item \emph{Control of atmospheric effects}: remove (most of) the unpolarized signals without any further assumptions or atmosphere models.
+          \item \emph{Numerical efficiency}: atmosphere introduces long noise correlations, which worsen the \emph{conditioning} of the map-making system; removing those greatly speeds up the convergence (see Figure~\ref{fig:convergence}).
+          \item \emph{Near optimality}: polarization maps reconstructed from the differenced TOD are formally equivalent to the GLS solution if we assume no particular model for the atmosphere (i.e. only that it is unpolarized and common to the orthogonal detectors in a pair).
         \end{itemize}
 
         \heading{Pitfalls}
@@ -258,9 +258,9 @@
           \item different beam shapes
         \end{itemize}
 
-        We would like to assess the impact of those effects and find out in what conditions pair differencing is a viable approach for producing maps of the CMB polarization for B-mode search.
-
       \end{alertblock}
+
+      \textbf{We want to assess the impact of those effects and find out in what conditions pair differencing is a viable approach for producing maps of the CMB polarization for B-mode search.}
 
     \end{column}
 
@@ -296,14 +296,28 @@
         \begin{figure}
           \centering
           \includegraphics[width=0.8\textwidth]{figures/comparison.png}
-          \caption{Resulting B-mode residual spectra for different configurations. Dashed lines represent theory BB spectra for $r$ equal to $\numlist[mode=text]{0;1e-3;1e-2}$. Solid lines are residual (noise) spectra.}
+          % \caption{Resulting B-mode residual spectra for different configurations. Dashed lines represent theory BB spectra for $r$ equal to $\numlist[mode=text]{0;1e-3;1e-2}$. Solid lines are residual (noise) spectra.}
         \end{figure}
 
-        Few comments on the figure?
+        Dashed lines represent theory BB spectra.
+        In black are the lensed B modes; in blue and orange are the primordial B modes for a tensor-to-scalar ratio of 0.01 and 0.1 respectively.
+        Solid lines are the residual spectra reconstructed in different configurations.
+        \begin{itemize}
+          \item \textbf{black}: reference case (no gain errors)
+          \item {\color{Green} \textbf{green}}: pair differencing (PD) run according to description above
+          \item {\color{Red} \textbf{red}}: PD run, but without including atmospheric signal (aligned with black)
+          \item {\color{Purple} \textbf{purple}}: PD run, but without a rotating half wave plate
+          \item {\color{Sepia} \textbf{brown}}: PD run, without atmosphere and without HWP (only the CMB intensity is leaking into the differenced TOD)
+          \item {\color{VioletRed} \textbf{pink}}: PD run, additionally fitting for the leaked intensity signal
+        \end{itemize}
+
+        Overall, the plot highlights the importance of a rotating half wave plate to modulate the polarization signal.
+        It effectively prevents the leaked intensity signal to contaminate the \emph{large scales} of the map, where the signal of interest lives.
+        Also, fitting for a leaked intensity component comes very close to the reference case.
 
       \end{block}
 
-      \begin{block}{Future work, improvements}
+      \begin{block}{Future work and improvements}
 
         \begin{itemize}
           \item Refine simulations by adding bandpass and beam differences.
