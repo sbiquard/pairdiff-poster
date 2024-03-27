@@ -68,11 +68,9 @@
 
 \title{Map-making strategies for next generation CMB polarization experiments}
 
-\author{Simon Biquard \inst{1}}
-% \and Another Author \inst{2}
+\author{Simon Biquard \inst{1} \and Radek Stompor \inst{2, 1} \and Josquin Errard \inst{1}}
 
-\institute[shortinst]{\inst{1} AstroParticule et Cosmologie, Paris, France}
-% \samelineand \inst{2} Another Institute
+\institute[shortinst]{\inst{1} AstroParticule et Cosmologie, Paris, France \samelineand \inst{2} Centre Pierre Binétruy, Berkeley, US}
 
 % ====================
 % Footer (optional)
@@ -90,10 +88,15 @@
 % ====================
 
 % use this to include logos on the left and/or right side of the header:
-\logoleft{\includegraphics[height=7cm]{logos/logo_apc.png}}
-\logoright{
-  \includegraphics[height=6cm]{logos/logo_upcite.png},
-  \includegraphics[height=6cm]{logos/logo_cnrs_bleu.png}
+\logoleft{
+  \includegraphics[height=4cm]{logos/logo_apc.png},
+  \includegraphics[height=4cm]{logos/logo_upcite.png},
+  \includegraphics[height=4cm]{logos/logo_cnrs_bleu.png},
+  }
+  \logoright{
+    \includegraphics[height=4cm]{logos/LOGO_ERC-FLAG_FP.png},
+    \includegraphics[height=4cm]{logos/logo_scipol_new.jpeg},
+  % \includegraphics[height=4cm]{logos/logo_dim_origines.png},
 }
 
 % ====================
@@ -142,7 +145,7 @@
 
       \end{block}
 
-      \begin{alertblock}{Quick review of map-making flavors}
+      \begin{block}{Quick review of map-making flavors}
 
         \heading{Data model and estimators}
 
@@ -181,77 +184,62 @@
 
         \heading{Observing from the ground}
 
-        Ground-based experiments have to deal with two specific contaminants which are very bright compared to the CMB:
+        Ground-based experiments have to deal with two specific contaminants which are very bright compared to the CMB anisotropies:
 
         \begin{itemize}
           \item \emph{atmospheric signal}, a major source of noise correlations
           \item \emph{ground pickup}, typically due to the far side-lobes of the beam
         \end{itemize}
 
-        The binned estimate will not take these effects into account at all and the resulting map may be severely completely dominated by them.
-        The GLS estimate will consider these components as noise and downweight them to make an optimal map.
-        The filter-bin estimate will fit and remove a model of those signals from the TOD, but this will typically remove some sky signal as well; the effect must be quantified and corrected using transfer functions.
-        Template map-making will jointly deproject the contaminants and estimate the sky signal in an unbiased way.
+        % The binned estimate will not take these effects into account at all and the resulting map may be severely completely dominated by them.
+        % The GLS estimate will consider these components as noise and downweight them to make an optimal map.
+        % The filter-bin estimate will fit and remove a model of those signals from the TOD, but this will typically remove some sky signal as well; the effect must be quantified and corrected using transfer functions.
+        % Template map-making will jointly deproject the contaminants and estimate the sky signal in an unbiased way.
 
-        % TODO: comment about how the different methods deal with those contaminants
+        All methods listed above can account for such effects (by either introducing appropriate filters, or defining templates, or adding extra degrees of freedom) and offer different trade-offs between precision, accuracy, and computational efficiency.
+        In particular, the \emph{filter-bin} techniques are very computationally efficient and require only a general knowledge of the contaminants.
+        But they produce a \emph{biased representation} of the sky signal and require extensive simulations to correct for this effect later.
+        The \emph{GLS and template methods} are in turn \emph{computationally heavy} and require precise \emph{contaminant models}.
+        However, they provide high accuracy and high precision estimates of the sky maps.
 
-      \end{alertblock}
+        Here we study a hybrid approach, which could in principle benefit from the advantages of the GLS and template techniques while being numerically efficient and only requiring generic assumptions about the contaminants.
 
-      \begin{block}{The pair differencing approach}
+      \end{block}
 
-        \begin{wrapfigure}{r}{0.4\colwidth}
-          \includegraphics[width=\linewidth]{figures/sinuous-antenna-center-red.png}
-          \caption{Center of a sinuous antenna detector used for Simons Observatory.}
-          \label{fig:sinuous-antenna}
-        \end{wrapfigure}
+      \begin{alertblock}{The pair differencing approach}
+
+        % \begin{wrapfigure}{R}{0.35\colwidth}
+        %   \includegraphics[width=\linewidth]{figures/sinuous-antenna-center-red.png}
+        %   \caption{Center of a sinuous antenna detector used for Simons Observatory.}
+        %   \label{fig:sinuous-antenna}
+        % \end{wrapfigure}
 
         We assume that the atmospheric signal and the ground pickup are \emph{unpolarized}.
-        This motivates the \textbf{pair differencing} approach, where the timestreams of two orthogonal detectors (see Figure~\ref{fig:sinuous-antenna}) are subtracted in order to eliminate non polarized signals.
+        The idea is to use the dual-polarization detectors
+        %(see Figure~\ref{fig:sinuous-antenna}) 
+        to eliminate non polarized signals:
         \[
           d_{A/B} = I \pm P
           \quad\longrightarrow\quad
           d_- = \frac12 \pab{d_A - d_B} = P
         \]
 
-        This operation ideally decouples intensity and polarization components so that we can reconstruct the polarization signal \emph{exclusively} from the differenced TOD.
-        This simple approach has been (and still is) used in CMB experiments such as Polarbear, BICEP, (others ?) % TODO: citations
+        This subtraction ideally decouples intensity and polarization components so that we can reconstruct the polarization signal \emph{exclusively} from the differenced TOD.
+        This simple approach has been (and still is) used in CMB experiments such as Polarbear or BICEP. % TODO: citations
 
         \heading{Advantages}
 
-        The map-making equation is solved \emph{iteratively} using a conjugate gradient (CG) algorithm.
-        If $m_t$ is the approximate solution obtained at the $t$-th step of the algorithm, and $m_\ast$ the true solution, then an upper bound of the error is given by:
+        \begin{itemize}
+          \item Remove (most of) the unpolarized signals without any further assumptions or atmosphere models.
+          \item Numerical benefits: atmosphere introduces long noise correlations, which worsen the \emph{conditioning} of the map-making system; removing those greatly speeds up the convergence (see Figure~\ref{fig:convergence}).
+          \item Polarization maps reconstructed from the differenced TOD are formally equivalent to the GLS solution if we assume no particular model for the atmosphere (i.e. only that it is unpolarized and common to the orthogonal detectors in a pair).
+        \end{itemize}
 
-        \begin{equation}
-          \Vab{m_\ast - m_t}_A \leq 2 \bab{\frac{\sqrt{\mathcolor{red}{\kappa}} - 1}{\sqrt{\mathcolor{red}{\kappa}} + 1}}^t \Vab{m_\ast - m_0}_A
-        \end{equation}
+        \heading{Pitfalls}
 
-        So the convergence rate of the algorithm essentially depends on the \emph{condition number} $\kappa$ of the system matrix.
-        Strong noise correlations increase $\kappa$. By removing most of the intensity signal of the atmosphere, we also drastically improve the convergence speed of the algorithm (Figure~\ref{fig:convergence}). % TODO: use autoref ?
-
-        % TODO: comment about near optimality of pair diff
-        We can show that pair differencing is nearly optimal [\dots]
-
-      \end{block}
-
-    \end{column}
-
-    \separatorcolumn
-
-    \begin{column}{\colwidth}
-
-      \begin{block}{}
-
-        \begin{figure}
-          \centering
-          \includegraphics[width=0.8\textwidth]{figures/convergence.png}
-          \caption{Convergence comparison with and without atmospheric correlations.}
-          \label{fig:convergence}
-        \end{figure}
-
-        \heading{Drawbacks}
-
-        For the intensity signal to fully cancel, the two orthogonal detectors have to be identical.
+        For the intensity signal to fully cancel, the two orthogonal detectors have to be \emph{identical}.
         Even with careful calibration, this can never be achieved perfectly.
+        Because the contaminants are much brighter than the CMB polarization, this is a real problem for pair differencing.
         The most important effects which are expected to cause leakage of the intensity signal into the differenced TOD are:
 
         \begin{itemize}
@@ -260,38 +248,58 @@
           \item different beam shapes
         \end{itemize}
 
-      \end{block}
+        We would like to assess the impact of those effects and find out in what conditions pair differencing is a viable approach for producing maps of the CMB polarization for B-mode search.
 
-      \begin{block}{Simulations and results}
+      \end{alertblock}
 
-        % The Simons Observatory (SO) is a ground-based CMB experiment located on Cerro Toco, $\qty[mode=text]{5300}{\meter}$ above sea level, in the Atacama desert of Chile.
+    \end{column}
+
+    \separatorcolumn
+
+    \begin{column}{\colwidth}
+
+      \begin{figure}
+        \centering
+        \includegraphics[width=0.8\textwidth]{figures/convergence.png}
+        \caption{Convergence comparison with and without atmospheric correlations.}
+        \label{fig:convergence}
+      \end{figure}
+
+      \begin{block}{Preliminary results}
+
+        % The Simons Observatory (SO) is a ground-based CMB experiment located on Cerro Toco, $\qty[mode=text]{5200}{\meter}$ above sea level, in the Atacama desert of Chile.
         % The \say{nominal} SO experiment consists of three $\qty[mode=text]{0.4}{\meter}$ Small Aperture Telescopes (SATs) and one $\qty[mode=text]{6}{\meter}$ Large Aperture Telescope (LAT).
 
-        I use the map-making library \texttt{mappraiser}~\cite{ElBouhargani:2021umq} to process simulations produced with the \texttt{TOAST} software:
+        Our current setup uses the TOAST framework for simulating data
 
         \begin{itemize}
-          \item instrument: SO-SAT @ $\qty[mode=text]{90}{\giga\hertz}$
+          \item instrument: Simons Observatory Small Aperture Telescope @ $\qty[mode=text]{90}{\giga\hertz}$
           \item schedule: one day per month during one year
           \item sky: CMB lensed scalar anisotropies (from Planck FFP10 simulations)
           \item high-resolution atmosphere simulation
           \item instrumental noise
-          \item gain errors in detector pairs
-          \item in the future: elliptical beams
+          \item gain errors of one percent in detector pairs
         \end{itemize}
 
-        \emph{Figure of merit ?}
+        For the moment, we simply compare the B-mode residual spectra to the theoretical predictions.
 
         \begin{figure}
           \centering
           \includegraphics[width=0.8\textwidth]{figures/comparison.png}
-          \caption{B-mode spectrum in different configurations. Solid lines are the measured spectrum, dotted lines are the difference with respect to the input spectrum (residual).}
+          \caption{Resulting B-mode residual spectra for different configurations. Dashed lines represent theory BB spectra for $r$ equal to $\numlist[mode=text]{0;1e-3;1e-2}$. Solid lines are residual (noise) spectra.}
         \end{figure}
+
+        Few comments on the figure?
+
       \end{block}
 
-      \begin{block}{Conclusion / Discussion ?}
+      \begin{block}{Future work, improvements}
 
-        In what conditions is pair differencing reasonable to use?
-        What do we lose? What do we gain?
+        \begin{itemize}
+          \item Refine simulations by adding bandpass and beam differences.
+          \item Include realistic gain calibration error distributions.
+          \item Perform a likelihood analysis to estimate biases and sensitivities to the tensor-to-scalar ratio.
+        \end{itemize}
 
       \end{block}
 
