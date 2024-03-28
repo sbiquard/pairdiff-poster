@@ -35,8 +35,10 @@
   isbn=false,
   eprint=false,
 ]{biblatex}
-\addbibresource{poster.bib}
+\renewbibmacro{in:}{}
+\AtEveryBibitem{\clearlist{language}}
 \AtBeginBibliography{\footnotesize}
+\addbibresource{poster.bib}
 
 \usepackage{unicode-math}
 \setmathfont[Scale=MatchUppercase]{libertinusmath-regular.otf}
@@ -149,10 +151,10 @@
             \text{}     & \textbf{Polarbear}                 & \textbf{SO}                       & \textbf{CMB-S4}                    \\
             \midrule
             Data volume & $\qty[mode=text]{100}{\tera\byte}$ & $\qty[mode=text]{2}{\peta\byte}$  & $\qty[mode=text]{50}{\peta\byte}$  \\
-            CPU time    & $\qty[mode=text]{20}{\kilo\hour}$  & $\qty[mode=text]{35}{\mega\hour}$ & $\qty[mode=text]{500}{\mega\hour}$ \\
+            CPU time    & $\qty[mode=text]{2.5}{\mega\hour}$  & $\qty[mode=text]{35}{\mega\hour}$ & $\qty[mode=text]{1.2}{\giga\hour}$ \\
             \bottomrule
           \end{tabular}
-          \caption{Data volume and current CPU time needed to produce \emph{one} sky map.}
+          \caption{Data volume and current CPU time needed to produce \emph{one} sky map. Estimation credits to Hamza El ElBouhargani.}
         \end{table}
 
       \end{block}
@@ -188,7 +190,7 @@
             \midrule
             Filter-and-bin  & \( \pab{\transpose{P} {\Lambda P}}^{-1} \transpose{P} F \)       & easy to compute         & biased        \\
             \midrule
-            Templates       & \( \pab{\transpose{P} F P}^{-1} \transpose{P} F \)               & unbiased filtering      & iterative     \\
+            Templates       & \( \pab{\transpose{P} F P}^{-1} \transpose{P} F \)               & unbiased filtering      & expensive     \\ % TODO: better word?
             \bottomrule
           \end{tabular}
           \caption{Comparison of different map-making approaches. Legend: $\Lambda$ = diagonal noise weights; $C_n^{-1}$ = noise covariance matrix; $F$ = filtering and weighting operator.}
@@ -306,11 +308,11 @@
         In black are the lensed B modes; in blue and orange are the primordial B modes for a tensor-to-scalar ratio of 0.01 and 0.1 respectively.
         Solid lines are the residual spectra reconstructed in different configurations.
         \begin{itemize}
-          \item \textbf{black}: reference case (no gain errors)
+          \item \textbf{black}: reference case (no gain errors, hidden by red curve)
           \item {\color{Green} \textbf{green}}: pair differencing (PD) run according to description above
           \item {\color{Red} \textbf{red}}: PD run, but without including atmospheric signal (aligned with black)
           \item {\color{Purple} \textbf{purple}}: PD run, but without the HWP modulation
-          \item {\color{Sepia} \textbf{brown}}: PD run, without atmosphere and without HWP (only the CMB intensity is leaking into the differenced TOD)
+          \item {\color{Sepia} \textbf{brown}}: PD run, without atmosphere and without HWP (increased residuals due to instrumental noise which is not modulated)
           \item {\color{VioletRed} \textbf{pink}}: PD run, additionally fitting for the leaked intensity signal
         \end{itemize}
 
